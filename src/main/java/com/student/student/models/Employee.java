@@ -4,14 +4,25 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Employee {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;
+
+    @NotNull(message = "First name is required")
+    @Size(min = 5,max = 20, message = "First name should have at least 2 characters and at most 20 characters")
     private String firstName;
+
+    @NotNull(message = "Last name is required")
+    @Size(min = 5,max = 20, message = "Last name should have at least 2 characters and at most 20 characters")
     private String lastName;
+
+    @Email(message = "Email should be valid")
     private String email;
     private String phone;
     private int salary;

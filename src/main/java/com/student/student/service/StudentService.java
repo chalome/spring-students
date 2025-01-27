@@ -3,6 +3,7 @@ package com.student.student.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.student.student.models.Student;
@@ -10,6 +11,8 @@ import com.student.student.repository.StudentRepository;
 
 @Service
 public class StudentService {
+    
+    @Autowired
     private final StudentRepository studentRepository;
 
     public StudentService(StudentRepository studentRepository) {

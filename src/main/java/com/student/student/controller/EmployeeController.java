@@ -2,13 +2,16 @@ package com.student.student.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.student.student.models.Employee;
 import com.student.student.service.EmployeeService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -18,9 +21,18 @@ public class EmployeeController {
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
+
     @GetMapping
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public Page<Employee> getAllEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(defaultValue = "asc") String order
+            ) {
+                Sort.Direction direction = order.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        // Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return employeeService.getAllEmployees(pageable);
     }
 
     @GetMapping("/{id}")
@@ -31,12 +43,12 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
+    public Employee createEmployee(@Valid @RequestBody Employee employee) {
         return employeeService.addEmployee(employee);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable int id, @RequestBody Employee updatedEmployee){
+    public ResponseEntity<Employee> updateEmployee(@Valid @PathVariable int id, @RequestBody Employee updatedEmployee) {
         return employeeService.getEmployeeById(id)
                 .map(existingEmployee -> {
                     existingEmployee.setFirstName(updatedEmployee.getFirstName());
@@ -50,6 +62,7 @@ public class EmployeeController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Employee> deleteEmployee(@PathVariable int id) {
         if (employeeService.getEmployeeById(id).isPresent()) {
